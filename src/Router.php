@@ -2,21 +2,34 @@
 
 namespace Boke0\Skull;
 
-class Router{
+class Router{    
     public function __construct(){
-        $this->root=new Part(NORMAL,"");
+        $this->root=new Part(Part::NORMAL,"");
     }
     private function setRoute($method,$path,$func){
-        $parts=array_slice(explode("/",$path),1);
-        $current=$this->root;
+        $parts=explode("/",$path);
+        $current=&$this->root;
+        echo "Setting {$path}:{$method}\n";
         foreach($parts as $part){
+            echo "Attaching ";
+            var_dump($part);
             $next=&$current->getRoute($part);
-            if(!$next){
-                $type=preg_match("/\{[\S]+\}/",$part,$argname)==1?ARG:NORMAL;
-                $next=new Part($type,$type==Part::ARG?$argname,$part);
-                $current->append(&$next);
+            echo "Next...";
+            var_dump($next!==FALSE?$next->name:NULL);
+            if($next===FALSE){
+                $matched_flg=preg_match("/\{([\S]+)\}/",$part,$argname);
+                var_dump(
+                    $matched_flg
+                );
+                $type=$matched_flg===1?Part::ARG:Part::NORMAL;
+                $next=new Part($type,$type==Part::ARG?$argname[1]:$part);
+                var_dump($next);
+                $current->setRoute($next);
+                $next=&$current->getRoute($part);
             }
-            $current=&$next;
+            $current=$next;
+            echo "Root...";
+            var_dump($this->root);
         }
         $current->setCall($method,$func);
     }
@@ -37,24 +50,18 @@ class Router{
             $this->setRoute($method,$path,$func);
         }
     }
-    public function dispatch($req,$res){
-        $uri=$res->getUri();
-        $path=$uri->getPath();
+    public function match($path,$method){
         $parts=explode("/",$path);
         $current=$this->root;
         $params=array();
         foreach($parts as $part){
             $current=$current->getRoute($part);
-            if($current->type==ARG) $params[$current->name]=$part;
+            if($current->type==Part::ARG) $params[$current->name]=$part;
         }
-        $func=$current->getCall($req->getMethod());
-        if(is_callable($func)){
-            $res=$func($req,$res,$params);
-        }else{
-            list($ctrlname,$act)=explode(".",$func);
-            $ctrl=$ctrlname();
-            $res=$ctrl->$act($req,$res,$params);
-        }
-        return $res;
+        $func=$current->getCall($method);
+        return $func?[
+            "callable"=>$func,
+            "params"=>$params
+        ]:FALSE;
     }
 }

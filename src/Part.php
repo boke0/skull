@@ -3,17 +3,14 @@ namespace Boke0\Skull;
 
 class Part{
     const ARG=0;
+    const NORMAL=1;
     public $name;
     public function __construct($type,$name){
-        $this->unnamed=NULL;
+        $this->unnamed=false;
         $this->named=array();
         $this->call=array();
-        if($type==self::ARG){
-            preg_match("/\{[\S]+\}/",$name,$matches);
-            $this->name=$matches[1];
-        }else{
-            $this->name=$name;
-        }
+        $this->type=$type;
+        $this->name=$name;
     }
     public function &getRoute($part){
         if(isset($this->named[$part])){
@@ -32,4 +29,8 @@ class Part{
     public function setCall($method,$call){
         $this->call[$method]=$call;
     }
+    public function getCall($method){
+        return $this->call[$method];
+    }
 }
+
