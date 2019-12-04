@@ -1,0 +1,21 @@
+{
+    "name": "boke0/skull",
+    "description": "PSR7対応のルーティングライブラリです。",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^8.4"
+    },
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "木瓜丸",
+            "email": "boke0@eugensite.com"
+        }
+    ],
+    "require": {},
+    "autoload":{
+        "psr-4":{
+            "Boke0\\Skull\\Test":"test/"
+        }
+    }
+}
