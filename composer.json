@@ -15,6 +15,7 @@
     "require": {},
     "autoload":{
         "psr-4":{
+            "Boke0\\Skull\\":"src/",
             "Boke0\\Skull\\Test\\":"test/"
         }
     }
