@@ -12,8 +12,15 @@ class Part{
         $this->type=$type;
         $this->name=$name;
     }
-    public function &getRoute($part){
+    public function &next($part){
         if(isset($this->named[$part])){
+            return $this->named[$part];
+        }else{
+            return $this->unnamed;
+        }
+    }
+    public function &getRoute($part,$type){
+        if($type==self::NORMAL){
             return $this->named[$part];
         }else{
             return $this->unnamed;

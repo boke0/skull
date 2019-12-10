@@ -9,27 +9,21 @@ class Router{
     private function setRoute($method,$path,$func){
         $parts=explode("/",$path);
         $current=&$this->root;
-        echo "Setting {$path}:{$method}\n";
         foreach($parts as $part){
-            echo "Attaching ";
-            var_dump($part);
-            $next=&$current->getRoute($part);
-            echo "Next...";
-            var_dump($next!==FALSE?$next->name:NULL);
-            if($next===FALSE){
-                $matched_flg=preg_match("/\{([\S]+)\}/",$part,$argname);
-                var_dump(
-                    $matched_flg
-                );
-                $type=$matched_flg===1?Part::ARG:Part::NORMAL;
-                $next=new Part($type,$type==Part::ARG?$argname[1]:$part);
-                var_dump($next);
-                $current->setRoute($next);
-                $next=&$current->getRoute($part);
+            $len=strlen($part);
+            if($len!=0&&$part[0]==":"){
+                $type=Part::ARG;
+            }else{
+                $type=Part::NORMAL;
             }
-            $current=$next;
-            echo "Root...";
-            var_dump($this->root);
+            $next=&$current->getRoute($part,$type);
+            if($next==NULL){
+                $argname=substr($part,1,$len-1);
+                $next=new Part($type,$type==Part::ARG?$argname:$part);
+                $current->setRoute($next);
+                $next=&$current->getRoute($part,$type);
+            }
+            $current=&$next;
         }
         $current->setCall($method,$func);
     }
@@ -52,14 +46,14 @@ class Router{
     }
     public function match($path,$method){
         $parts=explode("/",$path);
-        $current=$this->root;
+        $current=&$this->root;
         $params=array();
         foreach($parts as $part){
-            $current=$current->getRoute($part);
+            $current=&$current->next($part);
             if($current->type==Part::ARG) $params[$current->name]=$part;
         }
         $func=$current->getCall($method);
-        return $func?[
+        return $func!==FALSE?[
             "callable"=>$func,
             "params"=>$params
         ]:FALSE;
