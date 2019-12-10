@@ -8,33 +8,30 @@ class RouterTest extends TestCase{
     public function buildRoutes(){
         $router=new Router();
         $router->get("/",0);
-        //$router->post("/",1);
-        //$router->put("/",2);
-        //$router->delete("/",3);
+        $router->post("/",1);
+        $router->put("/",2);
+        $router->delete("/",3);
         $router->get("/foo",4);
-        //$router->post("/foo",5);
-        //$router->put("/foo",6);
-        //$router->delete("/foo",7);
-/*        $router->get("/foo/bar",8);
+        $router->post("/foo",5);
+        $router->put("/foo",6);
+        $router->delete("/foo",7);
+        $router->get("/foo/bar",8);
         $router->post("/foo/bar",9);
         $router->put("/foo/bar",10);
         $router->delete("/foo/bar",11);
-        $router->get("/foo/{id}",12);
-        $router->get("/foo/{id}/bar",13);
-        $router->post("/foo/{id}/bar",14);
-        $router->get("/foo/{id}/hoge",15);
-        $router->get("/foo/{id}/piyo",16);
+        $router->get("/foo/:id",12);
+        $router->get("/foo/:id/bar",13);
+        $router->post("/foo/:id/bar",14);
+        $router->get("/foo/:id/hoge",15);
+        $router->get("/foo/:id/piyo",16);
         $router->get("/piyo",17);
         $router->get("/piyo/foo",18);
-        $router->get("/piyo/foo/bar",19);*/
+        $router->get("/piyo/foo/bar",19);
         return $router;
-    }
-    public function testDumpRouter(){
-        var_dump($this->buildRoutes());
     }
     /**
      * @dataProvider providerMatch  
-     *
+     */
     public function testRoutingSuccess($path,$method,$expected_callable,$expected_params){
         return $this->assertEquals(
             $this->buildRoutes()->match($path,$method),
@@ -67,5 +64,5 @@ class RouterTest extends TestCase{
             ["/piyo/foo","GET",18,NULL],
             ["/piyo/foo/bar","GET",19,NULL]
         ];
-    }*/
+    }
 }
