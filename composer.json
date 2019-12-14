@@ -3,7 +3,8 @@
     "description": "PSR7対応のルーティングライブラリです。",
     "type": "library",
     "require-dev": {
-        "phpunit/phpunit": "^8.4"
+        "phpunit/phpunit": "^8.4",
+        "mockery/mockery": "^1.3"
     },
     "license": "GPL",
     "authors": [
@@ -15,11 +16,17 @@
     "require": {
         "psr/http-server-handler": "^1.0",
         "psr/http-message": "^1.0",
+        "psr/http-factory": "^1.0",
         "psr/http-server-middleware": "^1.0"
     },
     "autoload":{
         "psr-4":{
             "Boke0\\Skull\\":"src/"
+        }
+    },
+    "autoload-dev":{
+        "psr-4":{
+            "Boke0\\Skull\\Test\\":"test/"
         }
     }
 }
