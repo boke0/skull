@@ -2,8 +2,14 @@
 
 namespace Boke0\Skull;
 
+use \Psr\Http\Message\ServerRequestInterface;
+use \Psr\Http\Server\MiddlewareInterface;
+use \Psr\Http\Server\RequestHandlerInterface;
+use \Psr\Http\Message\ResponseInterface;
+use \Psr\Http\Message\ResponseFactoryInterface;
+
 class Dispatcher implements MiddlewareInterface{
-    public function __constructor(Router $router,ResponseFactory $responseFactory){
+    public function __construct(Router $router,ResponseFactoryInterface $responseFactory){
         $this->router=$router;
         $this->responseFactory=$responseFactory;
     }
@@ -11,23 +17,24 @@ class Dispatcher implements MiddlewareInterface{
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
-        $path=$request->getUri->getPath();
+        $path=$request->getUri()->getPath();
         $method=strtoupper($request->getMethod());
         $match=$this->router->match($path,$method);
         
         if(!$match){
             return $this->responseFactory->createResponse(404);
         }
-        list($handler,$params)=$match;
-        if(empty($handler)){
+        $callable=$match["callable"];
+        $params=$match["params"];
+        if(empty($callable)){
             throw new RuntimeException("Handler not defined.");
         }
-        foreach($match["args"] as $name=>$value){
+        foreach($params as $name=>$value){
             $request=$request->withAttribute($name,$value);
         }
-        if($handler instanceof Closure||is_callable($handler)){
-            return $handler($request);
-        }else if(method_exists($handler,"handle")){
+        if($callable instanceof Closure||is_callable($callable)){
+            return $callable($request);
+        }else if(method_exists($callable,"handle")){
             $instance=new $class();
             return $instance->handle($request);
         }else{
