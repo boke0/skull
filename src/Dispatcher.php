@@ -7,11 +7,12 @@ use \Psr\Http\Server\MiddlewareInterface;
 use \Psr\Http\Server\RequestHandlerInterface;
 use \Psr\Http\Message\ResponseInterface;
 use \Psr\Http\Message\ResponseFactoryInterface;
+use \Psr\Container\ContainerInterface;
 
 class Dispatcher implements MiddlewareInterface{
-    public function __construct(Router $router,ResponseFactoryInterface $responseFactory){
+    public function __construct(Router $router,ContainerInterface $container){
         $this->router=$router;
-        $this->responseFactory=$responseFactory;
+        $this->container=$container;
     }
     public function process(
         ServerRequestInterface $request,
@@ -22,7 +23,7 @@ class Dispatcher implements MiddlewareInterface{
         $match=$this->router->match($path,$method);
         
         if(!$match){
-            return $this->responseFactory->createResponse(404);
+            return $this->container->get("ResponseFactory")->createResponse(404);
         }
         $callable=$match["callable"];
         $params=$match["params"];

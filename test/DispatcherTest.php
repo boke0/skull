@@ -10,6 +10,7 @@ use \Psr\Http\Message\ResponseFactoryInterface;
 use \Psr\Http\Message\ResponseInterface;
 use \Psr\Http\Message\StreamInterface;
 use \Psr\Http\Message\UriInterface;
+use \Psr\Container\ContainerInterface;
 use \Mockery;
 
 class DispatcherTest extends RouterTest{
