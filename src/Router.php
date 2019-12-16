@@ -44,6 +44,11 @@ class Router{
             $this->setRoute($method,$path,$func);
         }
     }
+    public function any($path,$func){
+        foreach(["GET","POST","PUT","DELETE"] as $method){
+            $this->setRoute($method,$path,$func);
+        }
+    }
     public function match($path,$method){
         $parts=explode("/",$path);
         $current=&$this->root;
