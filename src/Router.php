@@ -13,6 +13,8 @@ class Router{
             $len=strlen($part);
             if($len!=0&&$part[0]==":"){
                 $type=Part::ARG;
+            }else if($part=="*"){
+                $type=Part::WILD;
             }else{
                 $type=Part::NORMAL;
             }
@@ -44,14 +46,23 @@ class Router{
             $this->setRoute($method,$path,$func);
         }
     }
+    public function any($path,$func){
+        foreach(["GET","POST","PUT","DELETE"] as $method){
+            $this->setRoute($method,$path,$func);
+        }
+    }
     public function match($path,$method){
         $parts=explode("/",$path);
         $current=&$this->root;
+        $wild=FALSE;
         $params=array();
         foreach($parts as $part){
+            $wild=&$current->getWild();
             $current=&$current->next($part);
+            if(!$current&&$wild) break;
             if($current->type==Part::ARG) $params[$current->name]=$part;
         }
+        if(!$current) $current=$wild;
         $func=$current->getCall($method);
         return $func!==FALSE?[
             "callable"=>$func,

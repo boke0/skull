@@ -4,13 +4,15 @@ namespace Boke0\Skull;
 class Part{
     const ARG=0;
     const NORMAL=1;
+    const WILD=2;
     public $name;
     public function __construct($type,$name){
-        $this->unnamed=false;
+        $this->unnamed=FALSE;
         $this->named=array();
         $this->call=array();
         $this->type=$type;
         $this->name=$name;
+        $this->wild=FALSE;
     }
     public function &next($part){
         if(isset($this->named[$part])){
@@ -20,17 +22,29 @@ class Part{
         }
     }
     public function &getRoute($part,$type){
-        if($type==self::NORMAL){
-            return $this->named[$part];
-        }else{
-            return $this->unnamed;
+        switch($type){
+            case self::NORMAL:
+                return $this->named[$part];
+            case self::WILD:
+                return $this->wild;
+            case self::ARG:
+                return $this->unnamed;
         }
     }
+    public function &getWild(){
+        return $this->wild;
+    }
     public function setRoute(Part $part){
-        if($part->type==self::ARG){
-            $this->unnamed=$part;
-        }else{
-            $this->named[$part->name]=$part;
+        switch($part->type){
+            case self::ARG:
+                $this->unnamed=$part;
+                break;
+            case self::NORMAL:
+                $this->named[$part->name]=$part;
+                break;
+            case self::WILD:
+                $this->wild=$part;
+                break;
         }
     }
     public function setCall($method,$call){

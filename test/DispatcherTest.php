@@ -38,9 +38,13 @@ class DispatcherTest extends RouterTest{
         $responseFactory=Mockery::mock(ResponseFactoryInterface::class);
         $responseFactory->shouldReceive("createResponse")
                         ->andReturn($response_404);
+        $container=Mockery::mock(ContainerInterface::class);
+        $container->shouldReceive("get")
+            ->with("ResponseFactory")
+            ->andReturn($responseFactory);
         $handler=Mockery::mock(RequestHandlerInterface::class);
         $request=$this->createMockRequest($method,$path);
-        $dispatcherMdlw=new Dispatcher($this->buildRoutesAwakening(),$responseFactory);
+        $dispatcherMdlw=new Dispatcher($this->buildRoutesAwakening(),$container);
         $result=$dispatcherMdlw->process($request,$handler)->getBody()->getContents();
         return $this->assertEquals($result,$expected_result);
     }
