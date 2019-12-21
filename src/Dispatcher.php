@@ -34,9 +34,9 @@ class Dispatcher implements MiddlewareInterface{
             $request=$request->withAttribute($name,$value);
         }
         if($callable instanceof Closure||is_callable($callable)){
-            return $callable($request);
+            return $callable($request,$params);
         }else if(method_exists($callable,"handle")){
-            return $callable->handle($request);
+            return $callable->handle($request,$params);
         }else if(class_exists($class)){
             $splitted=explode(".",$handler);
             if(count($splitted)==2){
@@ -49,7 +49,7 @@ class Dispatcher implements MiddlewareInterface{
                 throw new RuntimeException("Handler method not found.");
             }
             $instance=new $class();
-            return $instance->$act($request);
+            return $instance->$act($request,$params);
         }
 
     }
