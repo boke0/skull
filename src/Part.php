@@ -47,8 +47,8 @@ class Part{
                 break;
         }
     }
-    public function setCall($method,$call){
-        $this->call[$method]=$call;
+    public function setCall($method,$call,$act=FALSE){
+        $this->call[$method]=$act?[$call,$act]:$call;
     }
     public function getCall($method){
         return $this->call[$method];

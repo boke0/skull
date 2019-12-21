@@ -6,7 +6,7 @@ class Router{
     public function __construct(){
         $this->root=new Part(Part::NORMAL,"");
     }
-    private function setRoute($method,$path,$func){
+    private function setRoute($method,$path,$func,$act=FALSE){
         $parts=explode("/",$path);
         $current=&$this->root;
         foreach($parts as $part){
@@ -27,28 +27,28 @@ class Router{
             }
             $current=&$next;
         }
-        $current->setCall($method,$func);
+        $current->setCall($method,$func,$act);
     }
-    public function post($path,$func){
-        $this->setRoute("POST",$path,$func);
+    public function post($path,$func,$act=FALSE){
+        $this->setRoute("POST",$path,$func,$act);
     }
-    public function get($path,$func){
-        $this->setRoute("GET",$path,$func);
+    public function get($path,$func,$act=FALSE){
+        $this->setRoute("GET",$path,$func,$act);
     }
-    public function put($path,$func){
-        $this->setRoute("PUT",$path,$func);
+    public function put($path,$func,$act=FALSE){
+        $this->setRoute("PUT",$path,$func,$act);
     }
-    public function delete($path,$func){
-        $this->setRoute("DELETE",$path,$func);
+    public function delete($path,$func,$act=FALSE){
+        $this->setRoute("DELETE",$path,$func,$act);
     }
-    public function map($methods,$path,$func){
+    public function map($methods,$path,$func,$act=FALSE){
         foreach($methods as $method){
-            $this->setRoute($method,$path,$func);
+            $this->setRoute($method,$path,$func,$act);
         }
     }
-    public function any($path,$func){
+    public function any($path,$func,$act=FALSE){
         foreach(["GET","POST","PUT","DELETE"] as $method){
-            $this->setRoute($method,$path,$func);
+            $this->setRoute($method,$path,$func,$act);
         }
     }
     public function match($path,$method){
