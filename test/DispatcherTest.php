@@ -29,6 +29,15 @@ class DispatcherTest extends RouterTest{
      * @dataProvider providerMatch
      */
     public function testHandler($path,$method,$expected_result,$args){
+        $handler=Mockery::mock(RequestHandlerInterface::class);
+        $request=$this->createMockRequest($method,$path);
+        $dispatcherMdlw=$this->buildRoutesAwakening();
+        $result=$dispatcherMdlw->process($request,$handler)
+                               ->getBody()
+                               ->getContents();
+        return $this->assertEquals($result,$expected_result);
+    }
+    public function buildRoutesAwakening(){
         $response_404_body=Mockery::mock(StreamInterface::class);
         $response_404_body->shouldReceive("getContents")
                           ->andReturn(NULL);
@@ -38,19 +47,8 @@ class DispatcherTest extends RouterTest{
         $responseFactory=Mockery::mock(ResponseFactoryInterface::class);
         $responseFactory->shouldReceive("createResponse")
                         ->andReturn($response_404);
-        $container=Mockery::mock(ContainerInterface::class);
-        $container->shouldReceive("get")
-            ->with("ResponseFactory")
-            ->andReturn($responseFactory);
-        $handler=Mockery::mock(RequestHandlerInterface::class);
-        $request=$this->createMockRequest($method,$path);
-        $dispatcherMdlw=new Dispatcher($this->buildRoutesAwakening(),$container);
-        $result=$dispatcherMdlw->process($request,$handler)->getBody()->getContents();
-        return $this->assertEquals($result,$expected_result);
-    }
-    public function buildRoutesAwakening(){
         $params=$this->providerMatch();
-        $router=new Router();
+        $router=new Dispatcher($responseFactory);
         foreach($params as $l=>$param){
             $actname=strtolower($param[1]);
             $body=Mockery::mock(StreamInterface::class);

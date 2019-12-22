@@ -9,11 +9,15 @@ use \Psr\Http\Message\ResponseInterface;
 use \Psr\Http\Message\ResponseFactoryInterface;
 use \Psr\Container\ContainerInterface;
 
-class Dispatcher implements MiddlewareInterface{
-    public function __construct(Router $router,ResponseFactoryInterface $responseFactory,ContainerInterface $container){
-        $this->router=$router;
+class Dispatcher extends Router implements MiddlewareInterface{
+    public function __construct(ResponseFactoryInterface $responseFactory,$container=NULL){
+        parent::__construct();
         $this->factory=$responseFactory;
-        $this->container=$container;
+        if($container instanceof ContainerInterface){
+            $this->container=$container;
+        }else{
+            $this->container=FALSE;
+        }
     }
     public function process(
         ServerRequestInterface $request,
@@ -21,7 +25,7 @@ class Dispatcher implements MiddlewareInterface{
     ): ResponseInterface {
         $path=$request->getUri()->getPath();
         $method=strtoupper($request->getMethod());
-        $match=$this->router->match($path,$method);
+        $match=$this->match($path,$method);
         
         if(!$match){
             return $this->factory->createResponse(404);
@@ -30,26 +34,33 @@ class Dispatcher implements MiddlewareInterface{
         $params=$match["params"];
         if(is_array($callable)){
             list($callable,$act)=$callable;
+        }else{
+            $act=NULL;
         }
         if(empty($callable)){
-            throw new RuntimeException("Handler not defined.");
+            throw new \RuntimeException("Handler not defined.");
         }
         foreach($params as $name=>$value){
             $request=$request->withAttribute($name,$value);
         }
-        if($callable instanceof Closure||is_callable($callable)){
+        if($callable instanceof \Closure||is_callable($callable)){
             return $callable($request,$params);
-        }else if(method_exists($callable,"handle")){
-            $instance=$this->container->get($callable);
-            return $instance->handle($request,$params);
-        }else if(class_exists($callable)){
-            $splitted=explode(".",$handler);
-            if(!class_exists($callable)||array_search(get_class_methods($callable),$act)===FALSE){
-                throw new RuntimeException("Handler method not found.");
-            }
-            $instance=$this->container->get($callable);
-            return $instance->$act($request,$params);
         }
-
+        if(is_object($callable)){
+            $instance=$callable;
+        }else if(class_exists($callable)){
+            $instance=new $callable();
+        }else if($this->container&&$this->container->has($callable)){
+            if($this->container->has($callable)){
+                $instance=$this->container->get($callable);
+            }
+        }else{
+            throw new \RuntimeException("Handler method not found.");
+        }
+        if(method_exists($instance,(string) $act)){
+            return $instance->$act($request,$params);
+        }else{
+            return $instance->handle($request,$params);
+        }
     }
 }
