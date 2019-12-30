@@ -54,6 +54,7 @@ class Router{
     }
     public function match($path,$method){
         $parts=explode("/",$path);
+        if(array_slice($parts,-1,1)[0]=="") array_pop($parts);
         $current=&$this->root;
         $wild=FALSE;
         $params=array();
