@@ -8,6 +8,7 @@ class Router{
     }
     private function setRoute($method,$path,$func,$act=FALSE){
         $parts=explode("/",$path);
+        if(array_slice($parts,-1,1)=="") array_pop($parts);
         $current=&$this->root;
         foreach($parts as $part){
             $len=strlen($part);
