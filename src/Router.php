@@ -8,7 +8,7 @@ class Router{
     }
     private function setRoute($method,$path,$func,$act=FALSE){
         $parts=explode("/",$path);
-        if(array_slice($parts,-1,1)=="") array_pop($parts);
+        if(count($parts)>2&&array_slice($parts,-1,1)=="") array_pop($parts);
         $current=&$this->root;
         foreach($parts as $part){
             $len=strlen($part);
@@ -54,7 +54,7 @@ class Router{
     }
     public function match($path,$method){
         $parts=explode("/",$path);
-        if(array_slice($parts,-1,1)[0]=="") array_pop($parts);
+        if(count($parts)>2&&array_slice($parts,-1,1)[0]=="") array_pop($parts);
         $current=&$this->root;
         $wild=FALSE;
         $params=array();
