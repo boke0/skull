@@ -64,8 +64,21 @@ class Router{
             if(!$current&&$wild) break;
             if($current->type==Part::ARG) $params[$current->name]=$part;
         }
-        if(!$current) $current=$wild;
-        $func=$current->getCall($method);
+        if(!$current){
+            if($wild){
+                $current=$wild;
+            }else{
+                return FALSE;
+            }
+        }
+        $wild=&$current->getWild();
+        if($current->hasCall($method)){
+            $func=$current->getCall($method);
+        }else if($wild&&$wild->hasCall($method)){
+            $func=$wild->getCall($method);
+        }else{
+            $func=FALSE;
+        }
         return $func!==FALSE?[
             "callable"=>$func,
             "params"=>$params

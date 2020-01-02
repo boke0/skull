@@ -53,5 +53,8 @@ class Part{
     public function getCall($method){
         return $this->call[$method];
     }
+    public function hasCall($method){
+        return isset($this->call[$method]);
+    }
 }
 

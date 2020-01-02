@@ -24,7 +24,6 @@ class RouterTest extends TestCase{
         $router->post("/foo/:id/bar",14);
         $router->get("/foo/:id/hoge",15);
         $router->get("/foo/:id/piyo",16);
-        $router->get("/piyo",17);
         $router->get("/piyo/*",18);
         return $router;
     }
@@ -59,7 +58,7 @@ class RouterTest extends TestCase{
             ["/foo/789/bar","POST",14,["id"=>"789"]],
             ["/foo/123/hoge","GET",15,["id"=>"123"]],
             ["/foo/123/piyo","GET",16,["id"=>"123"]],
-            ["/piyo","GET",17,NULL],
+            ["/piyo","GET",18,NULL],
             ["/piyo/foo","GET",18,NULL],
             ["/piyo/foo/bar","GET",18,NULL]
         ];
