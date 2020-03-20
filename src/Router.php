@@ -59,8 +59,10 @@ class Router{
         $wild=FALSE;
         $params=array();
         foreach($parts as $part){
-            $wild=&$current->getWild();
-            $current=&$current->next($part);
+            if($current){
+                $wild=&$current->getWild();
+                $current=&$current->next($part);
+            }
             if(!$current&&$wild) break;
             if($current->type==Part::ARG) $params[$current->name]=$part;
         }
